@@ -35,11 +35,16 @@ def mostrar_datos():
     for beneficiario in beneficiarios_irpodha:
         for usuario in usuarios_samsa:
             if beneficiario[0] == usuario[0]:
+                # if usuario[1] in beneficiario[2]:
                 print("Resultado:")
-
                 print("Irpodha: ", beneficiario)
                 print("Samsa:   ", usuario)
-                x = input()
+                x = input("Actualizar clave_distribución: s/n")
+                if x == 's':
+                    beneficiario[3] = usuario[3] + "-" + usuario[4]
+                    print(beneficiario)
+                    cursorS.execute('UPDATE hoja_ruta SET CLAVE_DISTRIBUCION=?'beneficiario[3]')
+
 
     con_i.close()
     con_s.close()
@@ -47,4 +52,3 @@ def mostrar_datos():
 
 if __name__ == "__main__":
     mostrar_datos()
-
