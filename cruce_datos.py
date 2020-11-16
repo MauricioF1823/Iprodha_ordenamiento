@@ -3,7 +3,7 @@ import sqlite3 as sq
 
 def conexion_iprodha():
     try:
-        con = sq.connect('hoja_ruta_202010.db')
+        con = sq.connect('hoja_ruta_202011.db')
         return con
 
     except Exception as e:
@@ -26,43 +26,46 @@ def mostrar_datos():
     cursorI = con_i.cursor()
     cursorS = con_s.cursor()
 
-    cursorI.execute('SELECT NOMBRE, CHACRA_ADM, DIRECCION_POSTAL, CLAVE_IPRODHA, CLAVE_DISTRIBUCION From hoja_ruta')
-    cursorS.execute('SELECT APELLIDOYNOMBRE, CALLEPOSTAL, NROPOSTAL, CAMINANTE, POSICION from padron_2020')
+    cursorI.execute('SELECT NOMBRE, lOCALIDAD, SECCION_ADM, CHACRA_ADM, MANZANA_ADM, DIRECCION_POSTAL, CLAVE_IPRODHA, CLAVE_DISTRIBUCION From hoja_ruta_202011')
+    cursorS.execute('SELECT APELLIDOYNOMBRE, LOC, SECCION, CHACRA, MANZANA, CALLEPOSTAL, NROPOSTAL, CAMINANTE, POSICION from padron_2020')
 
     beneficiarios_irpodha = cursorI.fetchall()
     usuarios_samsa = cursorS.fetchall()
 
     for beneficiario in beneficiarios_irpodha:
         for usuario in usuarios_samsa:
-            if beneficiario[0] == usuario[0]:
-                # if usuario[1] in beneficiario[2]:
-                print("Resultado:")
-                print("Irpodha: ", beneficiario[0], beneficiario[2], beneficiario[1], " cam: ", str(beneficiario[4]))
-                print("Samsa:   ", usuario)
-                print(type(beneficiario[1]))
+            if beneficiario[1] in ['GARUPA', 'FACHINAL']:
+                if beneficiario[7] is None:
+                    if beneficiario[0] == usuario[0]:
+                        # if usuario[1] in beneficiario[2]:
+                        print("Resultado:")
+                        print("Irpodha: ", beneficiario[0]+"\t Localidad: "+str(beneficiario[1])+"\t Secc: "+str(beneficiario[2])+"\t Ch: "+str(beneficiario[3])+"\t\t Mzna: "+str(beneficiario[4])+"\t\t Clave_D: "+str(beneficiario[7]))
+                        print("Samsa:   ", usuario[0]+"\t localidad: "+str(usuario[1])+"\t\t sec: "+str(usuario[2])+"\t\t Ch: "+str(usuario[3])+"\t Mzna: "+str(usuario[4])+"\t Postal: "+str(usuario[5])+" "+str(usuario[6]))
+                        #print(type(beneficiario[1]))
 
-                print("1 - Actualizar clave distribucion con datos de samsa")
-                print("2 - Asignar chacra adm")
-                print("3 - Saltear")
-                x = input("Ingrese una opcion: ")
-                if x == '1':
-                    clave_distri = str(usuario[3]) + "-" + str(usuario[4])
-                    #print(clave_distri)
-                if x == '2':
-                    clave_distri = str(beneficiario[1])
-                if x == '3':
-                    pass
+                        print("1 - Actualizar clave distribucion con datos de samsa")
+                        print("2 - Asignar chacra adm")
+                        print("3 - Saltear")
+                        x = input("Ingrese una opcion: ")
+                        if x == '1':
+                            clave_distri = str(usuario[7]) + "-" + str(usuario[8])
+                            #print(clave_distri)
+                        if x == '2':
+                            clave_distri = str(beneficiario[2])
+                        if x == '3':
+                            pass
 
-                if x == '1' or x == '2':
-                    try:
-                        cursorI.execute("""UPDATE hoja_ruta SET CLAVE_DISTRIBUCION=? where CLAVE_IPRODHA=?""", (clave_distri, beneficiario[3]))
-                        con_i.commit()
-                        print("Actualizacion con exito")
-                    except Exception as e:
-                        print(e)
-
+                        if x == '1' or x == '2':
+                            try:
+                                cursorI.execute("""UPDATE hoja_ruta_202011 SET CLAVE_DISTRIBUCION=? where CLAVE_IPRODHA=?""", (clave_distri, beneficiario[3]))
+                                con_i.commit()
+                                print("Actualizacion con exito")
+                            except Exception as e:
+                                print(e)
+    print("Proceso finalizado")
     con_i.close()
     con_s.close()
+    print("Fin del programa")
 
 
 if __name__ == "__main__":
